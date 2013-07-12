@@ -1,0 +1,26 @@
+<html>
+<head>
+    <meta charset="utf-8" />
+    <title>Demo</title>
+</head>
+<body>
+	<div id="tableHolder"></div>
+   
+    <script src="jquery.js"></script>
+    
+    <script>
+ 
+    $(document).ready(function(){
+      refreshTable();
+    });
+
+    function refreshTable(){
+        $('#tableHolder').load('revised.php', function(){
+           setTimeout(refreshTable, 5000);
+        });
+    }
+ 
+    </script>
+ 
+</body>
+</html>
