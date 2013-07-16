@@ -1,0 +1,147 @@
+:-webkit-full-screen ##tableHolder {
+  width: 100%;
+  height: 100%;
+}
+
+.table {
+		border:3px solid #000000;
+		border-spacing: 0px;
+		width:100%;
+		height:50%;
+		font-family: Arial, Helvetica, sans-serif;
+	}
+	
+.caption&header {
+	
+}
+
+.empty_row {
+text-align: left;
+	text-indent: 100px;
+	background: url(bg_caption.gif) left top;
+	height: 40px;
+	color: #FFFFFF;
+	border:0px ;
+}
+	
+.caption_first_row{
+font-size: 1.8em;
+	text-align: left;
+	text-indent: 100px;
+	background: url(bg_caption.gif) left top;
+	height: 80px;
+	color: #FFFFFF;
+	border:1px solid #000000;
+	
+}
+
+.airport_name_caption {
+
+
+}
+
+.arrival_departure_caption {
+	
+	text-align: left;
+	text-indent: 100px;
+	background: url(bg_thead.gif) left top;
+	height: 30px;
+	color: #000000;
+	border:0px ;
+
+}
+
+.current_time_row {
+background: url(bg_thead.gif) left;
+color: #FFFFFF;
+}
+
+.current_time{
+}
+
+
+.header_rows {
+	background: url(bg_th.gif) left;
+	height: 21px;
+	color: #FFFFFF;
+	font-size: 0.8em;
+	font-family: Arial;
+	font-weight: bold;
+	padding: 0px 7px;
+	margin: 20px 0px 0px;
+	text-align: left;
+}
+
+.ident_header{
+}
+
+.aircraft_type_header {
+}
+
+.origin_header {
+}
+
+.arrival_time_header {
+}
+
+.status_header {
+
+}
+
+.content_rows {
+
+background: #f0f0f0;
+}
+
+.ident{
+font-size: 0.8em;
+	/*line-height: 1.4em;*/
+	font-family: Arial, Helvetica, sans-serif;
+	color: #000000;
+	padding: 10px 7px;
+	border-bottom: 1px solid #800000;
+	text-align: left;
+
+}
+
+.aircrafttype {
+font-size: 0.8em;
+	/*line-height: 1.4em;*/
+	font-family: Arial, Helvetica, sans-serif;
+	color: #000000;
+	padding: 10px 7px;
+	border-bottom: 1px solid #800000;
+	text-align: left;
+}
+
+.origin {
+font-size: 0.8em;
+	/*line-height: 1.4em;*/
+	font-family: Arial, Helvetica, sans-serif;
+	color: #000000;
+	padding: 10px 7px;
+	border-bottom: 1px solid #800000;
+	text-align: left;
+}
+
+.arrival_departure_time {
+font-size: 0.8em;
+	/*line-height: 1.4em;*/
+	font-family: Arial, Helvetica, sans-serif;
+	color: #000000;
+	padding: 10px 7px;
+	border-bottom: 1px solid #800000;
+	text-align: left;
+}
+
+.status {
+font-size: 0.8em;
+	/*line-height: 1.4em;*/
+	
+	font-family: Arial, Helvetica, sans-serif;
+	color: #000000;
+	padding: 10px 7px;
+	border-bottom: 1px solid #800000;
+	text-align: left;
+
+}

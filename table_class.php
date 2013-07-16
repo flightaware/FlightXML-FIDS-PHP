@@ -1,5 +1,6 @@
+
 <?php
-class two_table
+class table_class
 {
 	public $direction;
 	public $time_type;
@@ -19,10 +20,10 @@ class two_table
 			
 			$this->arrival = array_merge($arrived, $enroute);
 		
-			usort($this->arrival, array("two_table", "cmpAE"));
+			usort($this->arrival, array("table_class", "cmpAE"));
 		
 			$this->departure = array_merge($departed, $scheduled);
-			usort($this->departure, array("two_table", "cmpDS"));
+			usort($this->departure, array("table_class", "cmpDS"));
 			$groups =  array($this->arrival, $this->departure);
 		}
 		else
@@ -30,7 +31,7 @@ class two_table
 			$groups = array($arrived, $enroute, $departed, $scheduled);
 		}
 		
-		echo "<table width = '100%' cellpadding = '12' bgcolor = 'yellow'>";
+		echo "<table class = 'table'>";
 		
 		foreach ($groups as $group) {
 		
@@ -136,7 +137,7 @@ class two_table
 				
 				$caption = "DEPARTED";
 				
-				$this->print_header($caption);
+				$this->print_simple_header($caption);
 				
 				$this->gen_departed_content($group);
 				
@@ -155,7 +156,7 @@ class two_table
 			
 				$caption = "SCHEDULED";
 				
-				$this->print_header($caption);
+				$this->print_simple_header($caption);
 			
 				$this->gen_scheduled_content($group);
 				break;
@@ -163,7 +164,7 @@ class two_table
 			
 				$caption = "ENROUTE";
 				
-				$this->print_header($caption);
+				$this->print_simple_header($caption);
 				$this->gen_enroute_content($group);
 				break;
 			case $this->departure:
@@ -189,24 +190,42 @@ class two_table
 	}
 	
 	
+		function print_simple_header($caption) {
+		
+			echo "
+				<thead class = 'caption&header'>
+				<tr class = 'arrival_departure_caption'><th colspan = '5' >".$caption."</th></tr>
+					<tr class = 'header_rows'>
+						<th class = 'ident_header' >Ident</th>
+						<th class='aircraft_type_header'>Aircraft Type</th>
+						<th class = 'origin_header'>".$this->direction."</th>
+						<th class = 'arrival_time_header'>".$this->time_type."</th>
+						<th class = 'status_header'>Status</th>
+					</tr>
+				<thead>";
 	
+		 }
 	
 	function print_header($caption) {
 		
 		echo "
 			
-			<thead>
-			<tr><th align = 'center' colspan = '5'>"."<br/>".AIRPORT_FULLNAME."<br/>"."<br/>".$caption."</th></tr>";
+			<thead class = 'caption&header'>
+			<tr class = 'caption_first_row'><th class = 'airport_name_caption'  colspan = '5'>"."<br/>".AIRPORT_FULLNAME."<br/></tr>
+			<tr class = 'empty_row'><th class = 'airport_name_caption'  colspan = '5'></tr>
+			<tr class = 'arrival_departure_caption'><th colspan = '5' >".$caption."</th></tr>";
+				if (DIS_TIME == '1') {
 				if ($caption == "ARRIVAL" || $caption == "DEPARTURE") {
-					echo "<tr><th align = 'center'>".$this->date_time_convert(time())."</th></tr>";
+					echo "<tr class = 'current_time_row'><th class = 'current_time' colspan = '5's>".$this->date_time_convert(time())."</th></tr>";
+				}
 				}
 				echo "
-				<tr>
-					<th>Ident</th>
-					<th>Aircraft Type</th>
-					<th>".$this->direction."</th>
-					<th>".$this->time_type."</th>
-					<th>Status</th>
+				<tr class = 'header_rows'>
+					<th class = 'ident_header' >Ident</th>
+					<th class='aircraft_type_header'>Aircraft Type</th>
+					<th class = 'origin_header'>".$this->direction."</th>
+					<th class = 'arrival_time_header'>".$this->time_type."</th>
+					<th class = 'status_header'>Status</th>
 				</tr>
 			<thead>";
 	
@@ -291,13 +310,13 @@ class two_table
 	function print_arrived_content($flight, $status) {
 		
 		
-		echo "<tr>
-	
-			<td align = 'center'>".$flight->ident."</td>
-			<td align = 'center'>".$flight->aircrafttype."</td>
-			<td align = 'center'>".$flight->origin."</td>
-			<td align = 'center'>".$this->time_convert($flight->actualarrivaltime)."</td>
-			<td align = 'center'>".$status."</td>
+		echo "<tr class = 'content_rows'>
+			
+			<td class = 'ident'>".$flight->ident."</td>
+			<td class = 'aircrafttype'>".$flight->aircrafttype."</td>
+			<td class= 'origin'>".$flight->origin."</td>
+			<td class = 'arrival_departure_time'>".$this->time_convert($flight->actualarrivaltime)."</td>
+			<td class = 'status'>".$status."</td>
 	
 			</tr>";
 	
@@ -306,13 +325,13 @@ class two_table
 	function print_departed_content($flight, $status) {
 		
 		
-		echo "<tr>
+		echo "<tr class = 'content_rows'>
 	
-			<td align = 'center'>".$flight->ident."</td>
-			<td align = 'center'>".$flight->aircrafttype."</td>
-			<td align = 'center'>".$flight->destination."</td>
-			<td align = 'center'>".$this->time_convert($flight->actualdeparturetime)."</td>
-			<td align = 'center'>".$status."</td>
+			<td class = 'ident'>".$flight->ident."</td>
+			<td class = 'aircrafttype'>".$flight->aircrafttype."</td>
+			<td class= 'origin'>".$flight->destination."</td>
+			<td class = 'arrival_departure_time'>".$this->time_convert($flight->actualdeparturetime)."</td>
+			<td class = 'status'>".$status."</td>
 	
 			</tr>";
 	
@@ -324,13 +343,13 @@ class two_table
 				$status = "Delayed";
 			}
 		
-			echo "<tr>
+			echo "<tr class = 'content_rows'>
 	
-				<td align = 'center'>".$flight->ident."</td>
-				<td align = 'center'>".$flight->aircrafttype."</td>
-				<td align = 'center'>".$flight->destination."</td>
-				<td align = 'center'>".$this->time_convert($flight->filed_departuretime)."</td>
-				<td align = 'center'>".$status."</td>
+				<td class = 'ident'>".$flight->ident."</td>
+				<td class = 'aircrafttype'>".$flight->aircrafttype."</td>
+				<td class= 'origin'>".$flight->destination."</td>
+				<td class = 'arrival_departure_time'>".$this->time_convert($flight->filed_departuretime)."</td>
+				<td class = 'status'>".$status."</td>
 	
 				</tr>";
 	
@@ -347,13 +366,13 @@ class two_table
 				}
 			}
 		
-		echo "<tr>
+		echo "<tr class = 'content_rows'>
 	
-			<td align = 'center'>".$flight->ident."</td>
-			<td align = 'center'>".$flight->aircrafttype."</td>
-			<td align = 'center'>".$flight->origin."</td>
-			<td align = 'center'>".$this->time_convert($flight->estimatedarrivaltime)."</td>
-			<td align = 'center'>".$status."</td>
+			<td class = 'ident'>".$flight->ident."</td>
+			<td class = 'aircrafttype'>".$flight->aircrafttype."</td>
+			<td class= 'origin'>".$flight->origin."</td>
+			<td class = 'arrival_departure_time'>".$this->time_convert($flight->estimatedarrivaltime)."</td>
+			<td class = 'status'>".$status."</td>
 	
 			</tr>";
 	}
@@ -378,4 +397,6 @@ class two_table
 	}
 	
 }
+
+
 ?>
