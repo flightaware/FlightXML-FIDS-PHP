@@ -1,34 +1,49 @@
 
 <?php
+
 class table_class
 {
+
+
+	
 	public $direction;
 	public $time_type;
 	public $arrival;
 	public $departure;
+	public $arrived;
+	public $departed;
+	public $scheduled;
+	public $enroute;
 	
+	function __construct() {
+	
+		$data = unserialize(file_get_contents('testFile.xml'));
+		
+		extract($data);
+		$this->arrived = $arrived;
+		$this->enroute = $enroute;
+		$this->departed = $departed;
+		$this->scheduled = $scheduled;
+	}
+		
 	
 	function display()
 	{
-		global $arrived;
-		global $departed;
-		global $scheduled;
-		global $enroute;
 		
 		
 		if (DISPLAY_OPTION == '2') {
 			
-			$this->arrival = array_merge($arrived, $enroute);
+			$this->arrival = array_merge($this->arrived, $this->enroute);
 		
 			usort($this->arrival, array("table_class", "cmpAE"));
 		
-			$this->departure = array_merge($departed, $scheduled);
+			$this->departure = array_merge($this->departed, $this->scheduled);
 			usort($this->departure, array("table_class", "cmpDS"));
 			$groups =  array($this->arrival, $this->departure);
 		}
 		else
 		{
-			$groups = array($arrived, $enroute, $departed, $scheduled);
+			$groups = array($this->arrived, $this->enroute, $this->departed, $this->scheduled);
 		}
 		
 		echo "<table class = 'table'>";
@@ -115,13 +130,8 @@ class table_class
 
 	function gen_table($group)
 	{
-		global $arrived;
-		global $departed;
-		global $scheduled;
-		global $enroute;
-		global $departure;
-		global $arrival;
-		if ($group == $arrived || $group == $enroute || $group == $this->arrival) {
+	
+		if ($group == $this->arrived || $group == $this->enroute || $group == $this->arrival) {
 			$this->time_type = "Arrival Time";
 			$this->direction = "Origin";
 		}
@@ -133,7 +143,7 @@ class table_class
 	
 			switch($group) {
 
-			case $departed:
+			case $this->departed:
 				
 				$caption = "DEPARTED";
 				
@@ -143,7 +153,7 @@ class table_class
 				
 				break;
 	
-			case $arrived:
+			case $this->arrived:
 				
 				$caption = "ARRIVED";
 				
@@ -152,7 +162,7 @@ class table_class
 				$this->gen_arrived_content($group);
 			
 				break;	
-			case $scheduled:
+			case $this->scheduled:
 			
 				$caption = "SCHEDULED";
 				
@@ -160,7 +170,7 @@ class table_class
 			
 				$this->gen_scheduled_content($group);
 				break;
-			case $enroute:
+			case $this->enroute:
 			
 				$caption = "ENROUTE";
 				
@@ -216,7 +226,7 @@ class table_class
 			<tr class = 'arrival_departure_caption'><th colspan = '5' >".$caption."</th></tr>";
 				if (DIS_TIME == '1') {
 				if ($caption == "ARRIVAL" || $caption == "DEPARTURE") {
-					echo "<tr class = 'current_time_row'><th class = 'current_time' colspan = '5's>".$this->date_time_convert(time())."</th></tr>";
+					echo "<tr class = 'current_time_row'><th colspan = '5'>".$this->date_time_convert(time())."</th></tr>";
 				}
 				}
 				echo "
