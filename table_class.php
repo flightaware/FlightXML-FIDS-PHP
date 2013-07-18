@@ -1,6 +1,6 @@
 
 <?php
-
+date_default_timezone_set(timezone_name_from_abbr(TIMEZONE));
 class table_class
 {
 
@@ -17,7 +17,7 @@ class table_class
 	
 	function __construct() {
 	
-		$data = unserialize(file_get_contents('testFile.xml'));
+		$data = unserialize(file_get_contents('flightdata.xml'));
 		
 		extract($data);
 		$this->arrived = $arrived;
@@ -390,20 +390,20 @@ class table_class
 	
 	function time_convert($epoch) 
 	{
+		 
 		if ( $epoch >= (time()- time()%86400 + 86400) || $epoch < (time()- time()%86400)) {
+			/*
 			$dt = new DateTime("@$epoch");
 			return ($dt->format('H:i M/d'));
+			*/
+			return date("H:i m-d", $epoch);
 		}
-		$dt = new DateTime("@$epoch");
-		
-		
-		return ($dt->format("H:i"));
+		return date("H:i", $epoch);
 	}
 	
 	function date_time_convert($epoch) 
 	{
-		$dt = new DateTime("@$epoch");
-		return ($dt->format('Y-m-d H:i'));
+		return date("Y-m-d H:i:s"); 
 	}
 	
 }
