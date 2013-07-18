@@ -22,7 +22,7 @@ $enroute = $client->Enroute($params)->EnrouteResult->enroute;
 
 $groups = array('arrived' =>$arrived, 'enroute' =>$enroute, 'departed'=>$departed, 'scheduled'=>$scheduled);
 
-$myFile = "flightdata.xml";
+$myFile = FILENAME;
 
 if (!$fh = fopen($myFile, 'w') )
 {

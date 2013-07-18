@@ -17,7 +17,7 @@ class table_class
 	
 	function __construct() {
 	
-		$data = unserialize(file_get_contents('flightdata.xml'));
+		$data = unserialize(file_get_contents(FILENAME));
 		
 		extract($data);
 		$this->arrived = $arrived;
@@ -349,7 +349,7 @@ class table_class
 	
 		function print_scheduled_content($flight, $status) {
 			
-			if ($flight->filed_departuretime < time()) {
+			if ($flight->filed_departuretime < (time() - DELAY_THRESHHOLD)) {
 				$status = "Delayed";
 			}
 		
@@ -368,13 +368,17 @@ class table_class
 	function print_enroute_content($flight, $status) {
 	
 		if ($flight-> actualdeparturetime == '0') {
-			if ($flight->filed_departuretime < time()) {
+			if ($flight->filed_departuretime < (time() - DELAY_TRHESHHOLD)) {
 				$status = "Delayed";
+			}
+			
+			}
+			else if ($flight->estimatedarrivaltime < (time() - DELAY_THRESHHOLD)){
+			$status = "Delayed";
 			}
 			else{
 				$status = "Scheduled";
 				}
-			}
 		
 		echo "<tr class = 'content_rows'>
 	
@@ -390,8 +394,9 @@ class table_class
 	
 	function time_convert($epoch) 
 	{
-		 
-		if ( $epoch >= (time()- time()%86400 + 86400) || $epoch < (time()- time()%86400)) {
+		$tomorrow = mktime(0, 0, 0, date("m")  , date("d")+1, date("Y"));
+		$yesterday = mktime(0, 0, 0, date("m")  , date("d")-1, date("Y"));
+		if ( $epoch >= $tomorrow || $epoch < $yesterday) {
 			/*
 			$dt = new DateTime("@$epoch");
 			return ($dt->format('H:i M/d'));
@@ -405,6 +410,8 @@ class table_class
 	{
 		return date("Y-m-d H:i:s"); 
 	}
+	
+	
 	
 }
 

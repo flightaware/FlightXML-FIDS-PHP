@@ -18,20 +18,20 @@
       refreshTable();
     });
     
-    document.addEventListener("keydown", function(e) {
-	  if (e.keyCode == 13) {
-		toggleFullScreen();
-	  }
-	}, false);
+    
 
     function refreshTable(){
         $('#tableHolder').load('xml_parser.php', function(){
-           setTimeout(refreshTable, REFRESH_PERIOD);
+           setTimeout(refreshTable, 1000);
         });
     }
  
  
-
+	document.addEventListener("keydown", function(e) {
+	  if (e.keyCode == 13) {
+		toggleFullScreen();
+	  }
+	}, false);
 
 
 	function toggleFullScreen() {
@@ -54,7 +54,6 @@
 		}
 	  }
 	}
-
 
     </script>
     
