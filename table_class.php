@@ -411,26 +411,23 @@ class table_class
 	}
 	
 	function cal_refresh_interval() {
-		global $late;
-		$next_depart = $this->cal_next_departure();
-		$next_arrive = $this->cal_next_arrival();
-		
-		if ($late == false) {
-			return $this->range_check( min($next_depart, $next_arrive));
-		}
-		else{
-			$next_arr_delay = $this->cal_next_arrival_delay();
-			$next_dep_delay = $this->cal_next_departure_delay();
-			$cal_min = min($next_depart, $next_arrive, $next_arr_delay, $next_dep_delay);
-			return $this->range_check($cal_min);
+		$next_arr_delay = $this->cal_next_arrival_delay();
+		$next_dep_delay = $this->cal_next_departure_delay();
+		$next_dep = $this->cal_next_departure();
+		$next_arr = $this->cal_next_arrival();
+		$groups = array($next_arr_delay, $next_dep_delay, $next_dep, $next_arr);
+		foreach ($groups as $key => $group) {
+			if ($group == null) {
+				unset($groups[$key]);
+			}
 		}
 		
-		
-		
+		return $this->range_check(min($groups));
 	}
 	
-	function range_check($min_val) {
 	
+	function range_check($min_val) {
+		
 		if ($min_val < MAX_REFRESH_INTERVAL) {
 			if ($min_val < MIN_REFRESH_INTERVAL){
 				return MIN_REFRESH_INTERVAL;
@@ -446,8 +443,7 @@ class table_class
 	}
 
 function cal_next_departure() {
-	global $late;
-	
+
 	$min = mktime(0, 0, 0, date("m")  , date("d")+10, date("Y"));
 	$all_delay = true;
 	foreach ($this->scheduled as $flight) {
@@ -457,9 +453,7 @@ function cal_next_departure() {
 				$min = $flight->filed_departuretime;
 			}
 		}
-		else {
-			$late = true;
-		}
+		
 	}
 	if ($all_delay == true) {
 		return null;
@@ -482,9 +476,7 @@ function cal_next_arrival() {
 				$min = $flight->estimatedarrivaltime;
 			}
 		}
-		else {
-			$late = true;
-		}
+		
 	}
 	
 	if ($all_delay == true) {
