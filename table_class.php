@@ -5,7 +5,7 @@ class table_class
 {
 
 
-
+	public $interval; 
 	public $direction;
 	public $time_type;
 	public $arrival;
@@ -15,19 +15,73 @@ class table_class
 	public $scheduled;
 	public $enroute;
 	public $late;
+	public $saved_time;
 	
 	function __construct() {
+			
+		if (file_exists(FILENAME)) {
+		
+			if ($this->saved_time > (time() - $this->interval) ){
+				$data = unserialize(file_get_contents(FILENAME));
+		
+				extract($data);
+				$this->arrived = $arrived;
+				$this->enroute = $enroute;
+				$this->departed = $departed;
+				$this->scheduled = $scheduled;
+				$this->late = false;
+				$this->saved_time = $saved_time;
+			}
 	
-		$data = unserialize(file_get_contents(FILENAME));
 		
-		extract($data);
-		$this->arrived = $arrived;
-		$this->enroute = $enroute;
-		$this->departed = $departed;
-		$this->scheduled = $scheduled;
-		$this->late = false;
+		}
+		$this->refresh_data();
+		$this->interval= $this->cal_refresh_interval();
 	}
-		
+	
+	function refresh_data() {
+		$options = array(
+						'trace' => true,
+						'exceptions' => 0,
+						'login' => USERNAME,
+						'password' => APIKEY,
+						);
+		$client = new SoapClient('http://flightxml.flightaware.com/soap/FlightXML2/wsdl', $options);
+
+		$params = array("airport" => AIRPORT, "howMany" => NUM_FLIGHTS_DISPLAYED, "filter" => FILTER_PARAM, "offset" => OFFSET );
+
+		$this->arrived = $client->Arrived($params)->ArrivedResult->arrivals;
+
+		$this->departed = $client->Departed($params)->DepartedResult->departures;
+
+		$this->scheduled = $client->Scheduled($params)->ScheduledResult->scheduled;
+
+		$this->enroute = $client->Enroute($params)->EnrouteResult->enroute;
+
+		$groups = array('arrived' =>$this->arrived, 'enroute' =>$this->enroute, 'departed'=>$this->departed, 'scheduled'=>$this->scheduled, 'saved_time' => time());
+
+		$myFile = FILENAME;
+
+		if (!$fh = fopen($myFile, 'w') )
+		{
+			print "Cannot open file($myFile)";
+			exit;
+		}
+
+
+
+
+		if (!fwrite($fh, serialize($groups)) )
+		{
+			print "Cannot write to file($myFile)";
+			exit;
+		}
+	
+
+		file_put_contents($myFile,serialize($groups));
+
+		fclose($fh);
+	}
 	
 	function display()
 	{

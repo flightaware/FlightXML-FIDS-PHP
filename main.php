@@ -1,3 +1,4 @@
+
 <html>
 <head>
     <meta charset="utf-8" />
@@ -21,10 +22,12 @@
     
 
     function refreshTable(){
-    	
+    	var interval;
         $('#tableHolder').load('xml_parser.php', function(){
+           var newinterval = $('#refresh').text();
+           //alert("got newinterval " + newinterval);
            
-           setTimeout(refreshTable, 2000);
+           setTimeout(refreshTable, newinterval.valueOf()*1000);
         });
     }
  
