@@ -5,7 +5,7 @@ class table_class
 {
 
 
-	
+
 	public $direction;
 	public $time_type;
 	public $arrival;
@@ -14,6 +14,7 @@ class table_class
 	public $departed;
 	public $scheduled;
 	public $enroute;
+	public $late;
 	
 	function __construct() {
 	
@@ -24,6 +25,7 @@ class table_class
 		$this->enroute = $enroute;
 		$this->departed = $departed;
 		$this->scheduled = $scheduled;
+		$this->late = false;
 	}
 		
 	
@@ -368,7 +370,7 @@ class table_class
 	function print_enroute_content($flight, $status) {
 	
 		if ($flight-> actualdeparturetime == '0') {
-			if ($flight->filed_departuretime < (time() - DELAY_TRHESHHOLD)) {
+			if ($flight->filed_departuretime < (time() - DELAY_THRESHHOLD)) {
 				$status = "Delayed";
 			}
 			
@@ -397,10 +399,7 @@ class table_class
 		$tomorrow = mktime(0, 0, 0, date("m")  , date("d")+1, date("Y"));
 		$yesterday = mktime(0, 0, 0, date("m")  , date("d")-1, date("Y"));
 		if ( $epoch >= $tomorrow || $epoch < $yesterday) {
-			/*
-			$dt = new DateTime("@$epoch");
-			return ($dt->format('H:i M/d'));
-			*/
+			
 			return date("H:i m-d", $epoch);
 		}
 		return date("H:i", $epoch);
@@ -411,7 +410,148 @@ class table_class
 		return date("Y-m-d H:i:s"); 
 	}
 	
+	function cal_refresh_interval() {
+		global $late;
+		$next_depart = $this->cal_next_departure();
+		$next_arrive = $this->cal_next_arrival();
+		
+		if ($late == false) {
+			return $this->range_check( min($next_depart, $next_arrive));
+		}
+		else{
+			$next_arr_delay = $this->cal_next_arrival_delay();
+			$next_dep_delay = $this->cal_next_departure_delay();
+			$cal_min = min($next_depart, $next_arrive, $next_arr_delay, $next_dep_delay);
+			return $this->range_check($cal_min);
+		}
+		
+		
+		
+	}
 	
+	function range_check($min_val) {
+	
+		if ($min_val < MAX_REFRESH_INTERVAL) {
+			if ($min_val < MIN_REFRESH_INTERVAL){
+				return MIN_REFRESH_INTERVAL;
+			}
+			else {
+				return $min_val;
+			}
+		}
+		else {
+				return MAX_REFRESH_INTERVAL;
+		}
+		
+	}
+
+function cal_next_departure() {
+	global $late;
+	
+	$min = mktime(0, 0, 0, date("m")  , date("d")+10, date("Y"));
+	$all_delay = true;
+	foreach ($this->scheduled as $flight) {
+		if ($flight->filed_departuretime > time()){
+			$all_delay = false;
+			if ($flight->filed_departuretime < $min) {
+				$min = $flight->filed_departuretime;
+			}
+		}
+		else {
+			$late = true;
+		}
+	}
+	if ($all_delay == true) {
+		return null;
+	}
+	else {
+	 return ($min - time());
+	}
+}
+
+function cal_next_arrival() {
+
+	$min = mktime(0, 0, 0, date("m")  , date("d")+10, date("Y"));
+	$all_delay = true;
+	foreach ($this->enroute as $flight) {
+		if ($flight->estimatedarrivaltime > time()){
+			
+			$all_delay = false;
+			
+			if ($flight->estimatedarrivaltime < $min) {
+				$min = $flight->estimatedarrivaltime;
+			}
+		}
+		else {
+			$late = true;
+		}
+	}
+	
+	if ($all_delay == true) {
+		return null;
+	}
+	else {
+	 return ($min - time());
+	}
+}
+
+function cal_next_arrival_delay() {
+	$min = mktime(0, 0, 0, date("m")  , date("d")+10, date("Y"));
+	$all_pass = true;
+	foreach ($this->enroute as $flight) {
+		if ($flight->estimatedarrivaltime < time()){
+			$all_pass = false;
+			$delay_period = time() - $flight->estimatedarrivaltime;
+			if ($delay_period < DELAY_THRESHHOLD){
+				$diff = DELAY_THRESHHOLD - $delay_period;
+			}
+			else{
+				continue;
+			}
+			
+			if ($diff < $min) {
+				$min = $diff;
+			}
+		}
+	}
+	if ($all_pass == true) {
+		return null;
+	}
+	else {
+	 return $min;
+	}
+
+}
+function cal_next_departure_delay() {
+	
+	$min = mktime(0,0,0, date("m"), date("d")+10, date("Y"));
+	$all_pass = true;
+	foreach ($this->scheduled as $flight) {
+		if ($flight->filed_departuretime < time()) {
+			$all_pass = false;
+			$delay_period = time() - $flight->filed_departuretime;
+			if ($delay_period < DELAY_THRESHHOLD){
+				$diff = DELAY_THRESHHOLD - $delay_period;
+			}
+			else{
+				continue;
+			}
+			if ($diff < $min) {
+				
+				$min = $diff;
+				
+			}
+		}
+	}
+	if ($all_pass == true) {
+		return null;
+	}
+	else {
+	
+	 return $min;
+	}
+}
+
 	
 }
 

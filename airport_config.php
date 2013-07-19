@@ -10,7 +10,9 @@ define("REFRESH_PERIOD", 2000);
 define("NUM_FLIGHTS_DISPLAYED", 5);
 define("FILTER_PARAM", "");
 define("OFFSET", '0');
-define("TIMEZONE", 'CST');
+define('TIMEZONE', 'CST');
 define("FILENAME", "flightdata.xml");
 define("DELAY_THRESHHOLD", 900);
+define("MAX_REFRESH_INTERVAL", 600);
+define("MIN_REFRESH_INTERVAL", 60);
 ?>

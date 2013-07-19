@@ -21,8 +21,10 @@
     
 
     function refreshTable(){
+    	
         $('#tableHolder').load('xml_parser.php', function(){
-           setTimeout(refreshTable, 1000);
+           
+           setTimeout(refreshTable, 2000);
         });
     }
  

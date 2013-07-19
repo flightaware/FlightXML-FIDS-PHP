@@ -1,4 +1,5 @@
 <?php
+
 require('airport_config.php');
 
 require('table_class.php');
@@ -48,8 +49,10 @@ $tb = new table_class();
 
 $tb->display();
 
-echo time();
+$interval = $tb->cal_refresh_interval();
+echo $interval;
 
+echo "<div style='display:none' = \"refreshinterval\">".$interval."</div>";
 
 
 ?>
