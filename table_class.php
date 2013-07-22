@@ -279,13 +279,7 @@ class table_class
 			<thead class = 'caption&header'>
 			<tr class = 'caption_first_row'><th class = 'airport_name_caption'  colspan = '5'>"."<br/>".AIRPORT_FULLNAME."<br/></tr>
 			<tr class = 'empty_row'><th class = 'airport_name_caption'  colspan = '5'></tr>
-			<tr class = 'arrival_departure_caption'><th colspan = '5' >".$caption."</th></tr>";
-				if (DIS_TIME == '1') {
-				if ($caption == "ARRIVAL" || $caption == "DEPARTURE") {
-					echo "<tr class = 'current_time_row'><th colspan = '5'>".$this->date_time_convert(time())."</th></tr>";
-				}
-				}
-				echo "
+			<tr class = 'arrival_departure_caption'><th colspan = '5' >".$caption."</th></tr>
 				<tr class = 'header_rows'>
 					<th class = 'ident_header' >Ident</th>
 					<th class='aircraft_type_header'>Aircraft Type</th>
