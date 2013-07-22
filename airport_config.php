@@ -13,14 +13,14 @@ define("AIRPORT_FULLNAME", "Austin-Bergstrom International Airport");
 /*
 Input the username you registered in your flightaware account.
 */
-define("USERNAME", "Username");
+define("USERNAME", "username");
 
 /*
 Input your Flightaware APIKey.
 If don't have one, obtain one from :
 https://flightaware.com/commercial/flightxml/key
 */
-define("APIKEY", "Password");
+define("APIKEY", "password");
 
 /*
 There're two modes of displaying options.
@@ -36,6 +36,7 @@ For enroute, arrived, scheduled & departed four categories,
 choose the maximum number of flights displayed for each category.
 Here, the number input is '5' for each category, so there will
 be at most '5*4 = 20' flights displayed on the screen.
+Input integer should be at least "3";
 */
 define("NUM_FLIGHTS_DISPLAYED", 5);
 
@@ -47,11 +48,7 @@ or null/empty to show all traffic.
 */
 define("FILTER_PARAM", "ga");
 
-/*
-offset	int	must be an integer value of the offset row count you want the search to start at. 
-Most requests should be 0.
-*/
-define("OFFSET", 0);
+
 /*
 Input your local timezone like 'CDT', 'EDT'.
 */
@@ -65,7 +62,7 @@ the fids at the same time, only one computer will request data from server, the 
 will just load data from the file.
 Input any filename with suffix '.xml' like 'flightdata.xml' below;
 */
-define("FILENAME", "flightdata.xml");
+define("CACHE_FILENAME", "flightdata.xml");
 
 /*
 FAA considers a flight to be delayed when it is 15 minutes later than its scheduled time.

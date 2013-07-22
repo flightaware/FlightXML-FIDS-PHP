@@ -17,27 +17,46 @@ class table_class
 	public $late;
 	public $saved_time;
 	
+	/*
+		The construction will check :
+		If current time is before the next refresh point, renew 
+		the parameters from the cached file.
+		If the current time has passed the supposed next refresh time, 
+		renew all the parameters by requesting the updated data from server.
+		
+	*/
 	function __construct() {
-			
-		if (file_exists(FILENAME)) {
 		
+		if (file_exists(CACHE_FILENAME)) {
+			$data = unserialize(file_get_contents(CACHE_FILENAME));
+			$this->saved_time = $data[4];
+			$this->interval = $data[5];
 			if ($this->saved_time > (time() - $this->interval) ){
-				$data = unserialize(file_get_contents(FILENAME));
-		
-				extract($data);
-				$this->arrived = $arrived;
-				$this->enroute = $enroute;
-				$this->departed = $departed;
-				$this->scheduled = $scheduled;
+				$this->arrived = $data[0];
+				$this->enroute = $data[1];
+				$this->departed = $data[2];
+				$this->scheduled = $data[3];
 				$this->late = false;
-				$this->saved_time = $saved_time;
+				
+			}
+			else {
+				$this->refresh_data();
+				
+				$this->interval= $this->cal_refresh_interval();	
 			}
 	
 		
 		}
-		$this->refresh_data();
-		$this->interval= $this->cal_refresh_interval();
+		else {
+			$this->refresh_data();
+			$this->interval= $this->cal_refresh_interval();
+		}
 	}
+	
+	/*
+		Refresh_data will send flightxml request to the server, obtain flights information, pass
+		the information, update the relevant parameters and store the data to the cached file.
+	*/
 	
 	function refresh_data() {
 		$options = array(
@@ -48,7 +67,7 @@ class table_class
 						);
 		$client = new SoapClient('http://flightxml.flightaware.com/soap/FlightXML2/wsdl', $options);
 
-		$params = array("airport" => AIRPORT, "howMany" => NUM_FLIGHTS_DISPLAYED, "filter" => FILTER_PARAM, "offset" => OFFSET );
+		$params = array("airport" => AIRPORT, "howMany" => NUM_FLIGHTS_DISPLAYED, "filter" => FILTER_PARAM, "offset" => 0 );
 
 		$this->arrived = $client->Arrived($params)->ArrivedResult->arrivals;
 
@@ -57,10 +76,16 @@ class table_class
 		$this->scheduled = $client->Scheduled($params)->ScheduledResult->scheduled;
 
 		$this->enroute = $client->Enroute($params)->EnrouteResult->enroute;
+		
+		$this->saved_time = time();
+		
+		$this->interval= $this->cal_refresh_interval();
+		
+		echo "saved_time".$this->saved_time;
 
-		$groups = array('arrived' =>$this->arrived, 'enroute' =>$this->enroute, 'departed'=>$this->departed, 'scheduled'=>$this->scheduled, 'saved_time' => time());
+		$groups = array($this->arrived, $this->enroute, $this->departed, $this->scheduled, $this->saved_time, $this->interval);
 
-		$myFile = FILENAME;
+		$myFile = CACHE_FILENAME;
 
 		if (!$fh = fopen($myFile, 'w') )
 		{
@@ -82,6 +107,16 @@ class table_class
 
 		fclose($fh);
 	}
+	
+	/*
+		Display will call gen_table function and generate 
+		tables according to the mode set in the configuration
+		file.
+		If category departed and scheduled are going to be displayed 
+		together as departure, arrived and enroute are going to be
+		displayed together as arrival, then display function will
+		sort the take off/land in time of the merged group in ascending order.
+	*/
 	
 	function display()
 	{
@@ -116,6 +151,10 @@ class table_class
 		
 	}
 	
+	/*
+		Comparison function for arrival which will be used by usort function 
+		in the above display function to sort the land in time;
+	*/
 	static function cmpAE($flightA, $flightE) {
 		if (array_key_exists("actualarrivaltime", $flightA)) {
 			if (array_key_exists("actualarrivaltime", $flightE)) {
@@ -148,6 +187,10 @@ class table_class
 		return ($a < $e) ? -1 : 1;
 	}
 	
+	/*
+		Comparison function for departure which will be used by usort function 
+		in the above display function to sort the take off time;
+	*/
 	static function cmpDS($flightD, $flightS) {
 	
 		if (array_key_exists("actualdeparturetime", $flightD)) {
@@ -172,18 +215,15 @@ class table_class
 			}
 		}
 	
-	
-	
-	
-		
-		
 		if ( $d == $s) {
 			return 0;
 		}
 		
 		return ($d < $s) ? -1 : 1;
 	}
-
+	/*
+		Below are gentable and its help functions that will generate html tables to display the fids.
+	*/
 	function gen_table($group)
 	{
 	
@@ -259,7 +299,7 @@ class table_class
 		function print_simple_header($caption) {
 		
 			echo "
-				<thead class = 'caption&header'>
+				<thead class = 'caption_header'>
 				<tr class = 'arrival_departure_caption'><th colspan = '5' >".$caption."</th></tr>
 					<tr class = 'header_rows'>
 						<th class = 'ident_header' >Ident</th>
@@ -268,7 +308,7 @@ class table_class
 						<th class = 'arrival_time_header'>".$this->time_type."</th>
 						<th class = 'status_header'>Status</th>
 					</tr>
-				<thead>";
+				</thead>";
 	
 		 }
 	
@@ -276,9 +316,9 @@ class table_class
 		
 		echo "
 			
-			<thead class = 'caption&header'>
+			<thead class = 'caption_header'>
 			<tr class = 'caption_first_row'><th class = 'airport_name_caption'  colspan = '5'>"."<br/>".AIRPORT_FULLNAME."<br/></tr>
-			<tr class = 'empty_row'><th class = 'airport_name_caption'  colspan = '5'></tr>
+			<tr class = 'empty_row'><th class = 'airport_name_caption'  colspan = '5'></th></tr>
 			<tr class = 'arrival_departure_caption'><th colspan = '5' >".$caption."</th></tr>
 				<tr class = 'header_rows'>
 					<th class = 'ident_header' >Ident</th>
@@ -287,7 +327,7 @@ class table_class
 					<th class = 'arrival_time_header'>".$this->time_type."</th>
 					<th class = 'status_header'>Status</th>
 				</tr>
-			<thead>";
+			</thead>";
 	
 	}
 	
@@ -441,7 +481,9 @@ class table_class
 			</tr>";
 	}
 	
-	
+	/*
+		This will convert the epoch time to local time;
+	*/
 	function time_convert($epoch) 
 	{
 		$tomorrow = mktime(0, 0, 0, date("m")  , date("d")+1, date("Y"));
@@ -453,10 +495,9 @@ class table_class
 		return date("H:i", $epoch);
 	}
 	
-	function date_time_convert($epoch) 
-	{
-		return date("Y-m-d H:i:s"); 
-	}
+	/*
+		Calculate the next refresh inteval;
+	*/
 	
 	function cal_refresh_interval() {
 		$next_arr_delay = $this->cal_next_arrival_delay();
@@ -473,15 +514,19 @@ class table_class
 		return $this->range_check(min($groups));
 	}
 	
-	
-	function range_check($min_val) {
+	/*
+		Help function for cal_refresh_interval to make 
+		sure the estimated interval of change is within
+		the customized range.
+	*/
+	function range_check($estimate_val) {
 		
-		if ($min_val < MAX_REFRESH_INTERVAL) {
-			if ($min_val < MIN_REFRESH_INTERVAL){
+		if ($estimate_val < MAX_REFRESH_INTERVAL) {
+			if ($estimate_val < MIN_REFRESH_INTERVAL){
 				return MIN_REFRESH_INTERVAL;
 			}
 			else {
-				return $min_val;
+				return $estimate_val;
 			}
 		}
 		else {
@@ -489,7 +534,11 @@ class table_class
 		}
 		
 	}
-
+/*
+	Help function for cal_refresh_interval that
+	will estimate the next change from scheduled
+	to departed.
+*/
 function cal_next_departure() {
 
 	$min = mktime(0, 0, 0, date("m")  , date("d")+10, date("Y"));
@@ -510,7 +559,11 @@ function cal_next_departure() {
 	 return ($min - time());
 	}
 }
-
+/*
+	Help function for cal_refresh_interval that
+	will estimate the next change from enroute
+	to arrived.
+*/
 function cal_next_arrival() {
 
 	$min = mktime(0, 0, 0, date("m")  , date("d")+10, date("Y"));
@@ -535,6 +588,11 @@ function cal_next_arrival() {
 	}
 }
 
+/*
+	Help function for cal_refresh_interval that
+	will estimate the next change from enroute
+	to delayed
+*/
 function cal_next_arrival_delay() {
 	$min = mktime(0, 0, 0, date("m")  , date("d")+10, date("Y"));
 	$all_pass = true;
@@ -562,6 +620,12 @@ function cal_next_arrival_delay() {
 	}
 
 }
+
+/*
+	Help function for cal_refresh_interval that
+	will estimate the next change from scheduled
+	to delayed
+*/
 function cal_next_departure_delay() {
 	
 	$min = mktime(0,0,0, date("m"), date("d")+10, date("Y"));
