@@ -5,18 +5,20 @@ This is an example Flight Information Display System (FIDS) using PHP and Flight
 
 
 
-
 About Fullscreen Display:
 -------------------------
 
-1.	The fullscreen mode is supported by Firefox 9.0, 10.0; Chrome 15, 20; Opera 12.10; Safai 5.0, 5.1; check [this] (https://developer.mozilla.org/en-US/docs/Web/Guide/DOM/Using_full_screen_mode)for details.
+1.	The fullscreen mode is supported by Firefox 9.0, 10.0; Chrome 15, 20; Opera 12.10; Safai 5.0, 5.1.
+	Check this [link] (https://developer.mozilla.org/en-US/docs/Web/Guide/DOM/Using_full_screen_mode) for details.
 
 2.	Press the Return or Enter key to enter fullscreen mode, press the ESC key (or F11) to exit fullscreen mode.
 	
 3.	Note that the fullscreen function is called on the html section that will call "xml_parser.php" file to generate tables. Table will automatically fill in
-	   the full width of the screen, but the height of table depends on the number of flights being displayed. You can change the height of each table row and font size
-	   by adjusting "css/fids.css". The unit is "vw", one percent of width of the screen or "vh", one percent of the height of the screen. So that no matter what are
-	   the real dimensions of the actual displaying screen, the ratio that table, column, row and fonts to the screen is fixed.
+	the full width of the screen, but the height of table depends on the number of flights being displayed. You can change the height of each table row and font size
+	by adjusting "css/fids.css". The unit is "vw", one percent of width of the screen or "vh", one percent of the height of the screen. So that no matter what are
+	the real dimensions of the actual displaying screen, the ratio that table, column, row and fonts to the screen is fixed.
+
+
 
 
 About Files:
