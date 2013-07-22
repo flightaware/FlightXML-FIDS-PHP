@@ -14,9 +14,6 @@ $tb->display();
 
 $interval = $tb->interval;
 
+echo "<div style='display:none' id='refresh'>$interval</div>";
 
-
-   
-echo "
-<div  style='display:none'  id = 'refresh'>$interval</div>";
 ?>
