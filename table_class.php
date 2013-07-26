@@ -81,7 +81,7 @@ class table_class
 		
 		$this->interval= $this->cal_refresh_interval();
 		
-		echo "saved_time".$this->saved_time;
+	
 
 		$groups = array($this->arrived, $this->enroute, $this->departed, $this->scheduled, $this->saved_time, $this->interval);
 
